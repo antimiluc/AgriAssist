@@ -33,16 +33,21 @@ db = sqlalchemy.create_engine(
 )
 
 @app.route("/", methods=["GET"])
-def test(culture):
-    print(culture)
+def test(request):
     res = ""
-    culture = "mais"
-    adventice = "folle avoine"
+    request_json = request.get_json()
+    if request.args and ('culture' in request.args) and ('adventice' in request.args):
+        culture = request.args.get('culture')
+        adventice = request.args.get('adventice')
+    elif request_json and ('culture' in request_json) and ('adventice' in request_json):
+        culture = request_json['culture']
+        adventice = request_json['adventice']
+    else:
+        return f'Adventice et culture non renseignées'
     with db.connect() as conn:
         # Execute the query and fetch all results
         query_culture = "SELECT id FROM CULTURE WHERE name ='"+culture+"'"
         query_adventice = "SELECT id,extension_url FROM ADVENTICE WHERE name ='"+adventice+"'"
-        #test = conn.execute("SELECT * FROM CULTURE").fetchall()
         id_culture = str(conn.execute(query_culture).fetchall()[0][0])
         id_adventice = str(conn.execute(query_adventice).fetchall()[0][0])
         url_adventice = url_infloweb + str(conn.execute(query_adventice).fetchall()[0][1])
@@ -51,22 +56,13 @@ def test(culture):
         # Pour chaque id, on fait une requete dans la table DESTRUCTION_METHOD pour récupérer les names et descriptions
         for row in list_destruction_method:
             query_info = "SELECT name, description_infloweb, description_euralis FROM DESTRUCTION_METHOD WHERE id ="+str(row[0])
-            #query_name = "SELECT name FROM DESTRUCTION_METHOD WHERE id ='"+str(row[0])+"'"
-            #query_info_infloweb = "SELECT description_infloweb FROM DESTRUCTION_METHOD WHERE id ='"+str(row[0])+"'"
-            #query_info_euralis = "SELECT description_euralis FROM DESTRUCTION_METHOD WHERE id ='"+str(row[0])+"'"
-            #name = conn.execute(query_name).fetchall()[0][0]
-            #info_infloweb = conn.execute(query_info_infloweb).fetchall()[0][0]
-            #info_euralis = conn.execute(query_info_euralis).fetchall()[0][0]
             info = conn.execute(query_info).fetchall()
             name = info[0][0]
             info_infloweb = info[0][1]
             info_euralis = info[0][2]
             if info_euralis == None:
                 info_euralis = "..."
-            res += "Methode de destruction : "+name+"\n"+info_infloweb+"\nInformation issue de Infloweb "+URL+"\nEuralis vous recommande "+info_euralis+"\n \n"
-            res.append({"id": row[0], "name": row[1]})
-
-    #return render_template("index.html", test=votes)
+            res += "Methode de destruction : "+name+"\n"+info_infloweb+"\nInformation issue de Infloweb "+url_adventice+"\nEuralis vous recommande "+info_euralis+"\n \n"
     return res
 
 if __name__ == "__main__":
