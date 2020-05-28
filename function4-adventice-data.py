@@ -11,7 +11,7 @@ db_user = os.environ.get("DB_USER")
 db_pass = os.environ.get("DB_PASS")
 db_name = os.environ.get("DB_NAME")
 cloud_sql_connection_name = os.environ.get("CLOUD_SQL_CONNECTION_NAME")
-
+url_infloweb = "http://www.infloweb.fr/"
 app = Flask(__name__)
 
 logger = logging.getLogger()
@@ -33,16 +33,41 @@ db = sqlalchemy.create_engine(
 )
 
 @app.route("/", methods=["GET"])
-def test():
-    res = []
+def test(culture):
+    print(culture)
+    res = ""
+    culture = "mais"
+    adventice = "folle avoine"
     with db.connect() as conn:
         # Execute the query and fetch all results
-        test = conn.execute("SELECT * FROM CULTURE").fetchall()
-        # Convert the results into a list of dicts representing votes
-        for row in test:
+        query_culture = "SELECT id FROM CULTURE WHERE name ='"+culture+"'"
+        query_adventice = "SELECT id,extension_url FROM ADVENTICE WHERE name ='"+adventice+"'"
+        #test = conn.execute("SELECT * FROM CULTURE").fetchall()
+        id_culture = str(conn.execute(query_culture).fetchall()[0][0])
+        id_adventice = str(conn.execute(query_adventice).fetchall()[0][0])
+        url_adventice = url_infloweb + str(conn.execute(query_adventice).fetchall()[0][1])
+        query_list_destruction_method = "SELECT id_destruction_method FROM IS_DESTROYED_BY WHERE id_culture ='"+id_culture+"' AND id_adventice= '"+id_adventice+"'"
+        list_destruction_method = conn.execute(query_list_destruction_method).fetchall()
+        # Pour chaque id, on fait une requete dans la table DESTRUCTION_METHOD pour récupérer les names et descriptions
+        for row in list_destruction_method:
+            query_info = "SELECT name, description_infloweb, description_euralis FROM DESTRUCTION_METHOD WHERE id ="+str(row[0])
+            #query_name = "SELECT name FROM DESTRUCTION_METHOD WHERE id ='"+str(row[0])+"'"
+            #query_info_infloweb = "SELECT description_infloweb FROM DESTRUCTION_METHOD WHERE id ='"+str(row[0])+"'"
+            #query_info_euralis = "SELECT description_euralis FROM DESTRUCTION_METHOD WHERE id ='"+str(row[0])+"'"
+            #name = conn.execute(query_name).fetchall()[0][0]
+            #info_infloweb = conn.execute(query_info_infloweb).fetchall()[0][0]
+            #info_euralis = conn.execute(query_info_euralis).fetchall()[0][0]
+            info = conn.execute(query_info).fetchall()
+            name = info[0][0]
+            info_infloweb = info[0][1]
+            info_euralis = info[0][2]
+            if info_euralis == None:
+                info_euralis = "..."
+            res += "Methode de destruction : "+name+"\n"+info_infloweb+"\nInformation issue de Infloweb "+URL+"\nEuralis vous recommande "+info_euralis+"\n \n"
             res.append({"id": row[0], "name": row[1]})
+
     #return render_template("index.html", test=votes)
-    return(res[0])
+    return res
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8080, debug=True)

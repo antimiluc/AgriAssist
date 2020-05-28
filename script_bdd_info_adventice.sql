@@ -5,7 +5,8 @@ DROP TABLE ADVENTICE;
 
 CREATE TABLE ADVENTICE (
     id INT NOT NULL AUTO_INCREMENT,
-    name VARCHAR(50),
+    name VARCHAR(100),
+    extension_url VARCHAR(100) NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -42,10 +43,10 @@ INSERT INTO CULTURE (name) VALUES ("orge");
 INSERT INTO CULTURE (name) VALUES ("soja");
 INSERT INTO CULTURE (name) VALUES ("tournesol");
 
-INSERT INTO ADVENTICE (name) VALUES ("folle avoine");
-INSERT INTO ADVENTICE (name) VALUES ("liseron des haies");
-INSERT INTO ADVENTICE (name) VALUES ("lampourde a gros fruits");
-INSERT INTO ADVENTICE (name) VALUES ("datura stramoine");
+INSERT INTO ADVENTICE (name,extension_url) VALUES ("folle avoine","folle-avoine-avoine-sterile");
+INSERT INTO ADVENTICE (name,extension_url) VALUES ("liseron des haies","liseron-des-haies");
+INSERT INTO ADVENTICE (name,extension_url) VALUES ("lampourde a gros fruits","lampourde-a-gros-fruits");
+INSERT INTO ADVENTICE (name,extension_url) VALUES ("datura stramoine","datura-stramoine");
 
 INSERT INTO DESTRUCTION_METHOD (id,type,name,description_infloweb) VALUES (1,"M","binage","En agriculture et jardinage, le binage consiste à ameublir la couche superficielle du sol autour des plantes cultivées.");
 INSERT INTO DESTRUCTION_METHOD (id,type,name,description_infloweb) VALUES (2,"B","rotation","La rotation culturale est en agriculture la suite de cultures échelonnées au fil des années sur une même parcelle. C'est un élément important de la gestion de la fertilité des sols et des bioagresseurs et donc un atout pour l'augmentation des rendements");
@@ -56,7 +57,6 @@ INSERT INTO DESTRUCTION_METHOD (id,type,name,description_infloweb) VALUES (6,"B"
 INSERT INTO DESTRUCTION_METHOD (id,type,name,description_infloweb) VALUES (7,"C","fluroxypyr","???");
 INSERT INTO DESTRUCTION_METHOD (id,type,name,description_infloweb) VALUES (8,"C","clopyralid","???");
 
-INSERT INTO IS_DESTROYED_BY (id_culture,id_adventice,id_destruction_method) VALUES (4,1,2);
 INSERT INTO IS_DESTROYED_BY (id_culture,id_adventice,id_destruction_method) VALUES (3,1,3);
 INSERT INTO IS_DESTROYED_BY (id_culture,id_adventice,id_destruction_method) VALUES (3,1,4);
 INSERT INTO IS_DESTROYED_BY (id_culture,id_adventice,id_destruction_method) VALUES (5,1,6);
